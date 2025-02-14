@@ -1,0 +1,354 @@
+Q.1 :- What are Classes and Objects?
+		1. Class
+			-> Declared using "class" keyword.
+			-> class Name is always in "Pascal Case".
+			-> class can have access specifiers as "public" and "internal" only
+			-> By Default it has "internal" as Access Specifier
+			-> Syntax : 
+						class MyClass {
+							// Code for class Members
+						}
+			-> User Defined datatype :- Represents both "State" and "Behaviour".
+			-> "State" -> Represents Properties  |  "Behaviour" -> Actions that Object can perform
+			-> Blueprint / Template that describe the details of an object.
+			-> It is Blueprint from which individual Objects are created.
+			-> Class composed of 3 things :-   "Name", "Attributes", "Operations" 
+
+			-> Variables declared using "class" keyword are Reference type variables.
+			-> Reference type variables have default value as null;
+			
+			-> Various types of Classes :
+					* Base Class :- Class whose members are inherited by another class. (Also calles as Parent Class)
+					* Derived Class :- Class that inherits from Base Class. (Also called as Child Class)
+					* Abstract Class :- Class that cannot be instantiated.
+									 :- Provides common base for derived classes.
+									 :- Can contain abstract methods (Methods without a body) as well as non-abstract methods.
+									 :- Eg.  
+											abstract class Animal {
+												public abstract void MakeSound();                -> This is abstract method
+												public void Display() {                          -> This is non-abstract (Normal) method
+													Console.WriteLine("This is an Animal!!");
+												}
+											}
+		2. Object
+			-> Instance of a Class
+			-> Can be considered as a thing that can perform activities.
+			-> Set of activities performed by the object is called as its "Behaviour".
+			-> All members of class can be accessed by a object.
+			-> To access class members by object, we use "(.) operator".
+			-> (.) Operator links the object name with the class member name.
+			-> Syntax :-
+						MyClass obj = new MyClass();
+						MyClass obj = new();  -> This is also a way to create an object
+								-> Here "obj" is the Object of class "MyClass".
+								-> MyClass is datatype
+								-> new keyword is used to create the object 
+								-> MyClass() Constructor is used too initialise the Object
+			->
+
+
+Q.2 :- What is Object Oriented Programming ?
+	* A Programming that uses Objects and Classes to design Software Applications.
+	* Classes => Blueprint for Creating Objects
+	* Objects => Instances of Classes
+	* Based on Concept of Objects i.e. Objects contain :-
+							-> Data in the form of "Attributes" & "Properties"
+							-> Code in the form of procedures "Methods" & "Functions"
+	* Benefits of Object Oriented Programming :-
+			-> Modularity : Breaks Complex Code into smaller parts (Objects)
+					Makes it easier to update and maintain code.
+			-> Reusability : Allows to use the same code multiple times by creating objects.
+			-> Flexibility : Allows to modify certain functionality of Objects without affecting other parts.
+			-> Scalability : Allows to implement changes and enhance functionality as the system grows.
+
+	* Principles of OOPS :-
+		-> There are 4 pillars of OOPS :
+			i).   Inheritance
+			ii).  Encapsulation
+			iii). Abstraction
+			iv).  Polymorphism
+
+		1. Inheritance
+				-> Consuming members defined in one class by another class by estabilishing parent-child relation.
+				-> Allows to define a New Class (Derived Class) based on Existing Class (Base Class);
+				-> It consists of all the class methods and class Members that exists in Parent Class
+				-> Base Class    : Class that is being inherited              -> (Can also be referred as Parent Class)
+				-> Derived Class : Class that is inheriting from Base Class	  -> (Can also be referred as Child Class)
+				-> Syntax :
+						class BaseClass {
+							// Code for Base Class
+						}
+						class DerivedClass : BaseClass {
+							// Code for Derived Class
+						}
+
+				-> Base Class -> Parent Class -> Super Class
+				-> Derived Class -> Child Class -> Sub Class
+				
+				-> Child class can consume members of parent class (Except of those declared as Private)
+				
+				-> Rules for Inheritance :-
+						* Constructor of Parent class must be available to the child class
+						* Child class can access the members of parent class but parent class cannot access members purely declared in child class.
+						* We can initialize a parent class variable using child class instance 
+						* Every class defined by us or Predefined in libraries has a default parent class (i.e. Object Class)
+							-> So members of Object Class (Equal, GetHashCode, GetType, ToString etc) are accessible from anywhere
+						* Multiple Inheritance is not allowed.
+						* In case the Parent class Constructor is Parameterized than it is not Implicitly callled
+							-> For this the Programmer should explicitly call the parent class constructor using the base keyword
+									-> DerivedClass() : base(Parameters ...) {}
+
+				-> Interface Classification in C#
+						1. Implementation Inheritation -> Class derived from another class
+						2. Interface Inheritance -> Class derived from Interfaces
+
+		
+		2. Encapsulation
+				-> Simply, It is Data Hiding (Hiding Internal Data from the outside world)
+				-> Process of binding the "State" (Data Members) and "Behaviour" (Member Functions) together in a Single Unit.
+				-> Hides internal state and functionality of the objects.
+				-> Restricts direct access to Data Members and Functions from other class
+
+				-> Can only be accessed by other classes by creating Objects and through these objects other classes can access the state and behaviour of this class
+				
+				-> Implementation Ways : 
+							-> By declaring the variables as Private (To restrict access from other classes)
+							-> By declaring a pair of public (getter and setter) methods to access from other classes
+				-> Encapsulation helps with Validating data before assigning it to the variables.
+
+				-> Implementing Encapsulation Using "Getter and Setter" Methods
+							-> Getter -> Fetches value from the private variables
+							-> Setter -> Sets changes the values stored in the private variables
+
+							-> Benefits
+									* Helps to Validate the user given data before storing in the variables
+									* Enhances Security of Data
+
+				-> Implementing Encapsulation Using "Properties"
+							-> Properties are language feature introduced in C#
+							-> Helps in protecting the field or variable by writing and reading from it
+							-> Encapsulation can be accomplished much more smoothly with Properties
+							-> Get set are declared within a property
+
+				-> Example :- 
+							class MyClass {
+								private string name;
+								private int age;
+
+								// Getter and Setter
+
+								public string GetName() { return name; }
+								public void SetName(string name) { this.name = name; }
+
+								public int GetAge() { return age; }
+								public void SetAge(int age) { this.age = age; }
+
+								// By Properties
+
+								public Name {
+									get { return name; }
+									set {
+										if(!string.IsNullOrEmpty(value)) { name = value; }
+										else { Console.WriteLine("Invalid Name!!"); }
+									}
+								}
+
+								public Age {
+									get { return age; }
+									set {
+										if(value > 0) { age = value; }
+										else { Console.WriteLine("Invalid Age!!!"); }
+									}
+								}
+							}
+			3. Abstraction
+				-> Representing essential features without including background details.
+				-> Hiding Implementation details of Object's feature
+				-> Focuses on "What an Object does" rather than How it does.
+				-> Simply, It is like providing necessary details to "use the functionality" and Hide how the functionality is executed internally.
+
+				-> Implementing Abstraction principle in C#
+							1). Using Interfaces  (We can achieve 100 % Abstraction)
+							2). Using Abstract Classes and Abstract Methods (0 - 100 % Abstraction -> Bcoz Abstraction allows to write the implementation in abstract classes while it is not possible in Interfaces)
+
+				-> Abstraction is Different from Encapsulation as :-
+						-> Encapsulation is "Data / Information" Hiding while Abstraction is "Implementation" Hiding.
+						-> In Encapsulation we hide the variables from direct access but allow public methods to manipulate them ensuring Validation
+						   In Abstraction we only provide services but hides how they are implementing the solution
+						-> In Encapsulation we group Data members and function in a single unit (class, enum, interface)
+						   In Abstraction we expose the interface containing methods but hide the child class containing the Implementation
+						-> Encapsulation is implemented by making data members private
+						   Abstraction in implemented using Abstract classes and Interfaces
+
+						-> Example :- Abstraction Using Interfaces
+							class MyClass()
+							{
+								public interface IBank
+								{
+									void ValidateCard();
+									void WithdrawMoney();
+									public void CheckBalance()
+									{
+										Console.WriteLine("This is the Balance checking Function");
+									}
+								}
+								class PNB : IBank
+								{
+									public void ValidateCard()
+									{
+										Console.WriteLine("This is PNB Valid Card");
+									}
+									public void WithdrawMoney()
+									{
+										Console.WriteLine("Money is withdrawn from the PNB");
+									}
+									void IBank.CheckBalance()  // This way we can override the method which was originally written in the interface
+									{
+										Console.WriteLine("PNB: Overridden Balance Checking");
+									}
+								}
+
+								class SBI : IBank {
+									public void ValidateCard()
+									{
+										Console.WriteLine("This is SBI Valid Card");
+									}
+									public void WithdrawMoney()
+									{
+										Console.WriteLine("Money is withdrawn from the SBI");
+									}
+									public void CheckBalance()  // This way the Original method in Interface is hidden and this method will be implemented when accessing objects of SBI
+									{
+										Console.WriteLine("SBI: Overridden Balance Checking");
+									}
+								}
+								public static void Main() {
+									IBank newBank = null;
+									Console.Write("Enter the Bank Name (SBI/PNB) : ");
+									string bankName = Console.ReadLine() ?? "";
+									if(bankName == "SBI")
+									{
+										newBank = new SBI();
+									} else if(bankName == "PNB")
+									{
+										newBank = new PNB();
+									} else
+									{
+									    Console.WriteLine("Invalid Bank Name!!");
+									}
+									if(newBank != null)
+									{
+										newBank.ValidateCard();
+										newBank.WithdrawMoney();
+										newBank.CheckBalance();
+									}
+								}
+
+							}
+
+				-> Abstract Classes and Abstract Methods
+						* Abstract Methods are methods declared using abstract keywords
+						* These methods are declared within abstract classes or interface
+						* Usually Contains only declaration and not the implementation
+						* Can be overridden in subclasses
+
+						* Abstract classes acts as a blueprint for other classes
+						* Abstract classes cannot be instantiated but can be used in following ways
+								-> By using them as base class for other classes to derive it
+						* Abstract classes can have both abstract as well as non-abstract methods
+						* Abstract classes can have normal methods as well but as objects can't be created for abstract classes it can't be accessed directly
+								-> in order to access them ther are two ways :
+										* Creating an object for derived class
+										* Creating a abstract reference of Abstract class by creating instance of derived class
+
+	Q.3 : Constructors in C#
+			-> Special Method in a Class
+			-> Used to Initialise the "Variables" of the Class and Allocating Memory
+			-> Name of Constructor is "Same" as the "Name of the Class" in which it is present.
+			-> Constructors are the first to be called while creating Objects.
+			-> Constructors does not return any value. They have no return type.
+
+			-> Syntax :- 
+					MyClass() {}  -> This is an example of Default Constructor of class "MyCLass"
+
+			-> Constructors are defined in two ways :-
+					i). Implicit -> By the Compiler
+					ii. Explicit -> By the Programmer
+
+			-> Constructors are called each time we create an instance of the class
+			-> Constructors are always Explicitly called and cannot be called by the Compiler.
+
+			-> In Case we don't declare a Constructor in class then Implicitly a Default Constructor is created by the Compiler called as "Implicit Constructor".
+			-> The Implicit Constructor doesn't take any parameters as input.
+			-> The Implicit Constructor initializes the class Variables with their default values.
+
+			-> Default Values initialised by Implicit Constructor :- (int -> 0 || bool -> False || string -> null)
+
+			-> Types of Constructors :-
+						1. Default / Parameterless Constructor
+										-> Constructor that does not take any parameter
+										-> Can be both Explicitly and Implicitly Defined
+										-> Defined Implicitly only in the case when it is not explicitly defined
+
+										-> Default Constructors are of two types :-
+														i). System Defined Default or Parameterless Constructor
+																	-> Defined by system in case programmer doesn't define a constructor.
+																	-> Assigns the Member Variables by their default values (Except for static variables)
+													   ii). User Defined Default or Parameterless Constructor
+																	-> Defined by the user without any parameter
+																	-> Doesn't accept any argument but logic can be specified in the constructor body
+
+						2. Parameterized Constructor
+										-> To initialize the Object dynamically with the user - given values.
+										-> Cannot be declared Implicitly.
+
+						3. Copy Constructor
+										-> Used to create multiple instances with same values
+										-> We send the Object of Same class as a parameter in this type of Constructor
+
+						4. Static Constructor
+										-> Constructor created as static is Static Constructor.
+										-> Doesn't contain any "Access Modifiers" (public, private, protected etc)
+										-> Can only initialize "Static Members" of the Class.
+										-> There can only be one Static Constructor.
+
+										-> Will only be "Invoked Once" (i.e. At the time when class loads for the first time) -> No matter how many objects we create
+
+										-> If class is static than we cannot create a object of that class.
+										
+										-> If class contains any static variables then only static constructors are defined Implicitly, otherwise we need to declare the explicitly.
+										-> These constructors are the "first to execute".
+										-> Static Constructors cannot be parameterised. (This means that we cannot overload the Static Constructors)
+										-> Non-Static members of the class cannot be initialised in the static constructor.
+										-> Static Members can be initialised in the Non-Static Constructor.
+
+						5. Private Constructor
+										-> Accessibility is Private.
+										-> Can only be accessed within the same class.
+										-> Objects of the class containing private Constructor cannot be created outside of the class.
+
+										-> Using Private Constructor, we can create Singleton design patterns.
+										-> Need of Private Constructor is when we have only static members.
+
+			Destructors
+				-> Special method present in the class
+				-> Also called as Finalizers
+				-> Used for any necessary final-cleanup when instance of the class is being collected by the Garbage Collector.
+
+				-> As Destructor is called implicitly by Garbage Collector so we cannot predict "When it will be called"
+
+				-> Syntax :-
+							class MyClass {
+								~ MyClass(){							-> Destructor
+										// Cleanup Statements
+								} 
+				
+				-> Automatically called by the Garbage Collector when the class instance needs to be destroyed.
+				-> Implicit calling of Destructor is sometimes done in midddle of program Execution (In Case the Memory is full)
+				-> Explicit calling can also be done by programmer using -> "GC.Collect()" Method by the programmer.
+
+				-> Destructors cannot be overloaded.
+				-> Invoked Implicitly
+				-> Parameterless
+
+
