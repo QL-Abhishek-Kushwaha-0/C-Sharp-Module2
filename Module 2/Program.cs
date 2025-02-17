@@ -10,16 +10,27 @@ namespace Module_2
         readonly long accountNumber;  // To ensure that once a account is created it then cannot be manipulated
         decimal balance;
 
-        // Constructor to initialise the Account with its 11 digit account number and balance as zero
+        //Constructor to initialise the Account with its 11 digit account number and balance as zero
         public BankAccount(string userName, int age)
         {
             accountHolderName = userName;
             accountHolderAge = age;
             Random random = new Random();
             accountNumber = random.NextInt64(10_000_000_000L, 99_999_999_999L);  // Will Create Account Number of 11 Digits
-            balance = 0.0m;
+            SetBalance(0.0m);
             Console.WriteLine($"Hey {accountHolderName}, Your account has been created!!");
-            DisplayAccountDetails();
+            //DisplayAccountDetails();
+        }
+
+        protected void SetBalance(decimal initialDeposit)
+        {
+            balance = initialDeposit;
+            //DisplayAccountDetails();
+        }
+
+        protected decimal GetBalance()
+        {
+            return balance;
         }
 
         // Method to Deposit the Money in Account
@@ -37,7 +48,7 @@ namespace Module_2
         }
 
         // Method to Withdraw the Money
-        public void Withdraw(decimal withdrawAmount)
+        public virtual void Withdraw(decimal withdrawAmount)
         {
             if (withdrawAmount > balance)
             {
@@ -59,7 +70,71 @@ namespace Module_2
         // Method to display the account Details
         public void DisplayAccountDetails()
         {
-            Console.WriteLine("Your Account Number is : {0} & Current Bank Balance is : {1}", accountNumber, balance);
+            Console.WriteLine("Your Account Number is : {0} & Current Bank Balance is : Rs {1}", accountNumber, balance);
+        }
+    }
+
+    // --------------------> TASK 3 <--------------------
+
+    class SavingsAccount : BankAccount
+    {
+        readonly int minSavingsAccountBalance = 500;
+        readonly decimal interest = 3;
+        public SavingsAccount(string userName, int age, decimal initialDeposit) : base(userName, age)
+        {
+            SetBalance(initialDeposit);
+            DisplayAccountDetails();
+        }
+
+        public override void Withdraw(decimal withdrawAmount)
+        {
+            decimal existingBalance = GetBalance();
+            if (existingBalance - withdrawAmount < minSavingsAccountBalance)
+            {
+
+                Console.Write($"Minimum Balance of {minSavingsAccountBalance} needs to be Maintained!!! Choose a lesses amount : ");
+                while (!decimal.TryParse(Console.ReadLine(), out withdrawAmount) || (existingBalance - withdrawAmount < minSavingsAccountBalance))
+                {
+                    Console.Write("Enter a Valid Amount (Maintaining Minimum Balance (Rs 500): ");
+                }
+            }
+            SetBalance(existingBalance - withdrawAmount);
+            Console.WriteLine($"Your Withdraw is Successfull!!! Your remaining Bank Balance is {GetBalance()}");
+        }
+        public void InterestCalculation()
+        {
+            decimal currentBalance = GetBalance();
+            decimal applicableInterest = (GetBalance() * interest) / 100;
+            SetBalance(applicableInterest + currentBalance);
+            currentBalance = GetBalance();
+            Console.WriteLine($"Your Bank Balance after adding Applicable Interest is {currentBalance}");
+        }
+    }
+
+    class CurrentAccount : BankAccount
+    {
+        readonly int minCurrentAccountBalance = 1000;
+
+        public CurrentAccount(string userName, int age, decimal initialDeposit) : base(userName, age)
+        {
+            SetBalance(initialDeposit);
+            DisplayAccountDetails();
+        }
+
+        public override void Withdraw(decimal withdrawAmount)
+        {
+            decimal existingBalance = GetBalance();
+            if (existingBalance - withdrawAmount < minCurrentAccountBalance)
+            {
+
+                Console.Write($"Minimum Balance of {minCurrentAccountBalance} needs to be Maintained!!! Choose a lesses amount : ");
+                while (!decimal.TryParse(Console.ReadLine(), out withdrawAmount) || (existingBalance - withdrawAmount < minCurrentAccountBalance))
+                {
+                    Console.Write("Enter a Valid Amount (Maintaining Minimum Balance (Rs 1000): ");
+                }
+            }
+            SetBalance(existingBalance - withdrawAmount);
+            Console.WriteLine($"Your Withdraw is Successfull!!! Your remaining Bank Balance is {GetBalance()}");
         }
     }
     class Module2
@@ -139,11 +214,11 @@ namespace Module_2
             Console.WriteLine();
             while (true)
             {
-                Console.Write("Choose from the following type of Transactions : \n1. Deposit\n2. Withdraw\n3. Show Balance\nEnter the choice of transaction : ");
+                Console.Write("Choose from the following type of Transactions : \n1. Deposit\n2. Withdraw\n3. Show Balance\n4. Balance after Applying Interest\nEnter the choice of transaction : ");
 
                 // Options available for transactions
                 int choice;
-                while (!int.TryParse(Console.ReadLine(), out choice) || choice > 3 || choice <= 0)
+                while (!int.TryParse(Console.ReadLine(), out choice) || choice > 4 || choice <= 0)
                 {
                     Console.Write("\nEnter a valid Choice : ");
                 }
@@ -152,7 +227,19 @@ namespace Module_2
                 {
                     myAccount.DisplayAccountDetails();
                     Console.WriteLine();
-                } else
+                }
+                else if (choice == 4)
+                {
+                    Console.WriteLine();
+                    if (myAccount is SavingsAccount savingAccount)
+                    {
+                        savingAccount.InterestCalculation();
+                    } else
+                    {
+                        Console.WriteLine($"Interest not appplicable on {myAccount.GetType().Name} type of account!!!");
+                    }
+                }
+                else
                 {
                     Console.Write((choice == 1) ? "\nEnter the Amount to be deposited : " : "\nEnter the Amount to be withdrawn : ");
                     decimal transactionAmount;
@@ -161,7 +248,7 @@ namespace Module_2
                         Console.Write("\nEnter a Valid Amount to continue with the transaction!!! : ");
                         continue;
                     }
-                    if(choice == 1) { myAccount.Deposit(transactionAmount); }
+                    if (choice == 1) { myAccount.Deposit(transactionAmount); }
                     else { myAccount.Withdraw(transactionAmount); }
                 }
 
@@ -175,38 +262,115 @@ namespace Module_2
             }
         }
 
-        static void NewAccount()
+        static void CurrentAccount(string userName, int userAge) {
+            decimal initialDeposit;
+            Console.Write("Enter the Amount to deposit : ");
+            while (!decimal.TryParse(Console.ReadLine(), out initialDeposit) || initialDeposit < 1000)
+            {
+                Console.WriteLine("To Create and Maintain a Current account a Minimum Balance of 1000 Should be maintained!!!");
+                Console.Write("Enter a valid amount to continue : ");
+            }
+            Console.WriteLine();
+            CurrentAccount newCurrentAccount = new CurrentAccount(userName, userAge, initialDeposit);
+            BankingOperations(newCurrentAccount);
+        }
+
+        static void SavingsAccount(string userName, int userAge)
+        {
+            decimal initialDeposit;
+            Console.Write("Enter the Amount to deposit : ");
+            while (!decimal.TryParse(Console.ReadLine(), out initialDeposit) || initialDeposit < 500)
+            {
+                Console.WriteLine("To Create and Maintain a Savings account a Minimum Balance of 500 Should be maintained!!!");
+                Console.Write("Enter a valid amount to continue : ");
+            }
+            Console.WriteLine();
+            SavingsAccount newSavingAccount = new SavingsAccount(userName, userAge, initialDeposit);
+            BankingOperations(newSavingAccount);
+        }
+
+        static void Task3()
+        {
+            int choice;
+            while (true)
+            {
+                Console.Write("\nWelcome to ABC Bank!!\n1. New Account\n2. Existing Account\nChoose your Account Type : ");
+                if (!int.TryParse(Console.ReadLine(), out choice) && (choice != 1 || choice != 2)) 
+                {
+                    Console.WriteLine("Enter a Valid Choice");
+                }
+                Console.WriteLine();
+                switch (choice)
+                {
+                    case 1:
+                        Console.Write("Choose the type of Account you want to open -: \n1. Current Account\n2. Savings Account\nEnter your Choice of Account (1 or 2) : ");
+                        while (!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2))
+                        {
+                            Console.Write("Enter a Valid Choice : ");
+                        }
+                        NewAccount(choice);
+                        break;
+                    case 2:
+                        Console.WriteLine("You don't have any existing Account!!");
+                        break;
+                    default:
+                        Console.WriteLine("Choose a Valid Account type!!!");
+                        break;
+                }
+
+                Console.Write("Enter 1 to continue with another account : ");
+
+                if (Console.ReadLine() != "1")
+                {
+                    Console.WriteLine("Thanks for visiting us!!!!");
+                    break;
+                }
+            }
+        }
+
+        static void NewAccount(int choice)
         {
             Console.WriteLine();
 
             Console.Write("Enter your Name : ");
-            string userName = Console.ReadLine();
+            string userName = Console.ReadLine() ?? "";
 
-            while (string.IsNullOrEmpty(userName))
+            while (string.IsNullOrEmpty(userName) || userName.Length < 3)
             {
-                Console.Write("Enter a Valid Name!! : ");
+                Console.Write("Enter a Valid Name (Name should contain at least 3 letters) !! : ");
                 userName = Console.ReadLine();
             }
 
             Console.Write("Enter your Age : ");
             int userAge;
 
-            while (!int.TryParse(Console.ReadLine(), out userAge))
+            while (!int.TryParse(Console.ReadLine(), out userAge) || userAge < 18)
             {
-                Console.Write("Enter Valid Age : ");
+                Console.Write("Enter Valid Age (Age >= 18): ");
             }
 
+           
+            if (userName.Length >= 3 && userAge >= 18)
+            {
+                switch (choice)
+                {
+                    case 0:
+                        BankAccount myAccount = new BankAccount(userName, userAge);
+                        myAccount.DisplayAccountDetails();
+                        BankingOperations(myAccount);
+                        break;
+                    case 1:
+                        CurrentAccount(userName, userAge);
+                        break;
+                    case 2:
+                        SavingsAccount(userName, userAge);
+                        break;
+                    default:
+                        Console.WriteLine("Choose a Valid Account type : ");
+                        break;
+                }
+            }
             Console.WriteLine();
-
-            if (userAge >= 18)
-            {
-                BankAccount newAccount = new BankAccount(userName, userAge);
-                BankingOperations(newAccount);
-            }
-            else
-            {
-                Console.WriteLine("Account cannot be created! Person is a Minor!!");
-            }
         }
         static void Task2()
         {
@@ -221,7 +385,7 @@ namespace Module_2
                 switch (choice)
                 {
                     case 1:
-                        NewAccount();
+                        NewAccount(0);
                         break;
                     case 2:
                         Console.WriteLine("You don't have any existing Account!!");
@@ -244,7 +408,7 @@ namespace Module_2
         {
             while (true)
             {
-                Console.Write("Task 1 -> Enter 1\nTask 2 -> Enter 2\nChoose the Task to perform : ");
+                Console.Write("Task 1 -> Enter 1\nTask 2 -> Enter 2\nTask 3 -> Enter 3\nChoose the Task to perform : ");
                 if (!int.TryParse(Console.ReadLine(), out int taskChoice))
                 {
                     Console.WriteLine("Enter a Valid Choice");
@@ -256,6 +420,9 @@ namespace Module_2
                         break;
                     case 2:
                         Task2();
+                        break;
+                    case 3:
+                        Task3();
                         break;
                     default:
                         Console.WriteLine("Wrong choice of Task!!");

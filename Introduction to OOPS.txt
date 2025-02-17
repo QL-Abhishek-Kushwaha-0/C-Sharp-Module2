@@ -261,6 +261,37 @@ Q.2 :- What is Object Oriented Programming ?
 										* Creating an object for derived class
 										* Creating a abstract reference of Abstract class by creating instance of derived class
 
+	Interfaces
+		-> Fundamental concept in C# to implement "Contract" or "Set of Rules" that  a class must follow.
+		-> Allow to define set of functionalities that a multiple classes can share
+
+		-> Every Abstract method in Interface should compulsarily implemented in Child Class (Without any fail)
+
+		-> Fully Unimplemented Class
+		-> Used for defining abstract classes as it contains method without implementation (i.e. Abstract Methods)
+		-> Used for achieving Complete Abstraction -> Bcoz it cannot have method body (Althogh it is now available after Version 8 of C#)
+
+		-> Used to Implement Multiple Inheritance (which is not possible in Normal Classes)
+		
+		-> Syntax
+				interface MyInterface() {
+
+					// By Default these methods will be public and abstract
+
+					void Method1();
+					Void Method2();
+					.
+					.
+					.
+					// Methods without implementation
+				}
+
+
+	* class -> Contains only Methods with body (Non-Abstract Methods)
+	* Abstract class -> Contains both Abstract (Methods without body) or Non-Abstract Methods (Methods without body)
+	* Interface -> Contains only Abstract Methods (Methods without the body)
+
+
 	Q.3 : Constructors in C#
 			-> Special Method in a Class
 			-> Used to Initialise the "Variables" of the Class and Allocating Memory
