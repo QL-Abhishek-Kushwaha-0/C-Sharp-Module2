@@ -22,9 +22,30 @@ namespace Module_2
             //DisplayAccountDetails();
         }
 
+        public BankAccount(long accountNumber, string userName, int userAge)
+        {
+            this.accountNumber = accountNumber;
+            accountHolderName = userName;
+            accountHolderAge = userAge;
+            SetBalance(0.0m);
+        }
+
+        void SaveAccount(long accountNumber, string accountHolderName, int accountHolderAge, decimal balance)
+        {
+            string accountDetailsStoragePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../AccountsStorage/", accountNumber + ".txt");
+            accountDetailsStoragePath = Path.GetFullPath(accountDetailsStoragePath);
+            //Console.WriteLine(accountDetailsStoragePath);
+
+            using (StreamWriter stream = new StreamWriter(accountDetailsStoragePath))
+            {
+                stream.WriteLine($"{accountNumber},{accountHolderName},{accountHolderAge},{balance}");
+            }
+        }
+
         protected void SetBalance(decimal initialDeposit)
         {
             balance = initialDeposit;
+            SaveAccount(accountNumber, accountHolderName, accountHolderAge, balance);
             //DisplayAccountDetails();
         }
 
@@ -86,6 +107,11 @@ namespace Module_2
             DisplayAccountDetails();
         }
 
+        public SavingsAccount(long accountNumber, string userName, int userAge, decimal existingBalance) : base(accountNumber, userName, userAge)
+        {
+            SetBalance(existingBalance);
+        }
+
         public override void Withdraw(decimal withdrawAmount)
         {
             decimal existingBalance = GetBalance();
@@ -119,6 +145,11 @@ namespace Module_2
         {
             SetBalance(initialDeposit);
             DisplayAccountDetails();
+        }
+
+        public CurrentAccount(long accountNumber, string userName, int userAge, decimal existingBalance) : base(accountNumber, userName, userAge)
+        {
+            SetBalance(existingBalance);
         }
 
         public override void Withdraw(decimal withdrawAmount)
@@ -160,10 +191,9 @@ namespace Module_2
         }
 
         // Method to calculate area of Rectangle
-        static int CalculateArea(int length, int width)
+        static double CalculateArea(double length, double width)
         {
-            int area = length * width;
-            return area;
+            return length * width;
         }
 
         // --------------------> TASK 1 <--------------------
@@ -180,9 +210,9 @@ namespace Module_2
             // Q.2 :- Method Parameters -> Calculate Area of a Rectangle – Create a method CalculateArea(int length, int width) that takes two parameters and returns the area of a rectangle.
             Console.WriteLine("Function for Area of Rectangle\n");
             Console.Write("Enter the length of the rectangle : ");
-            int rectLength = Convert.ToInt32(Console.ReadLine());
+            double rectLength = Convert.ToDouble(Console.ReadLine());
             Console.Write("Enter the width of the rectangle : ");
-            int rectWidth = Convert.ToInt32(Console.ReadLine());
+            double rectWidth = Convert.ToDouble(Console.ReadLine());
             Console.WriteLine($"Length : {rectLength} & Width : {rectWidth} => Area of the Rectangle : {CalculateArea(rectLength, rectWidth)}");
 
             Console.WriteLine();
@@ -234,7 +264,8 @@ namespace Module_2
                     if (myAccount is SavingsAccount savingAccount)
                     {
                         savingAccount.InterestCalculation();
-                    } else
+                    }
+                    else
                     {
                         Console.WriteLine($"Interest not appplicable on {myAccount.GetType().Name} type of account!!!");
                     }
@@ -262,7 +293,77 @@ namespace Module_2
             }
         }
 
-        static void CurrentAccount(string userName, int userAge) {
+        static void ShowAllAccounts()
+        {
+            Console.WriteLine();
+            string filePath = @"D:\Quokka Labs\Module 2\Module 2\bin\AccountsStorage";
+
+            string[] accountPaths = Directory.GetFiles(filePath); // Gives the path of each file
+            string[] accounts = Directory.GetFiles(filePath, "*.txt", SearchOption.AllDirectories);
+
+            Console.WriteLine("Accounts associated with this Bank : ");
+            int idx = 1;
+            Console.WriteLine($"{"S.No.",-5} {"Name",-25} {"Account Number",-20} {"Age",-5}");
+            Console.WriteLine(new string('-', 60));
+
+            foreach (string account in accounts)
+            {
+                using (StreamReader stream = new StreamReader(account))
+                {
+                    string accountDetails = stream.ReadToEnd();
+                    string[] props = accountDetails.Split(',');
+
+                    Console.WriteLine($"{idx++,-5} {props[1],-25} {props[0],-20} {props[2],-5}");
+                }
+            }
+
+        }
+
+        static void Bank()
+        {
+            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("1. Create Bank Account\n2. Create Current or Savings Account\n3. Create or Login Current and Savings Account\n4. List all the Accounts\nChoose the Task to perform or (Press 5 to Exit) : ");
+                if (!int.TryParse(Console.ReadLine(), out int taskChoice) || (taskChoice <= 0 && taskChoice > 5))
+                {
+                    Console.WriteLine("Enter a Valid Choice");
+                }
+                if(taskChoice == 5)
+                {
+                    Console.WriteLine("Exited!!!");
+                    break;
+                }
+                switch (taskChoice)
+                {
+                    case 1:
+                        Task2();
+                        break;
+                    case 2:
+                        Task3(2);
+                        break;
+                    case 3:
+                        Task3(3);
+                        break;
+                    case 4:
+                        ShowAllAccounts();
+                        break;
+                    default:
+                        Console.WriteLine("Wrong choice of Task!!");
+                        break;
+                }
+                Console.Write("\nDo You wish to Continue to another Bank Operation?? Enter 1 for Yes : ");
+                if (Console.ReadLine() != "1")
+                {
+                    Console.WriteLine("Exited!!!");
+                    break;
+                }
+                Console.WriteLine();
+            }
+        }
+
+        static void CurrentAccount(string userName, int userAge)
+        {
             decimal initialDeposit;
             Console.Write("Enter the Amount to deposit : ");
             while (!decimal.TryParse(Console.ReadLine(), out initialDeposit) || initialDeposit < 1000)
@@ -289,45 +390,6 @@ namespace Module_2
             BankingOperations(newSavingAccount);
         }
 
-        static void Task3()
-        {
-            int choice;
-            while (true)
-            {
-                Console.Write("\nWelcome to ABC Bank!!\n1. New Account\n2. Existing Account\nChoose your Account Type : ");
-                if (!int.TryParse(Console.ReadLine(), out choice) && (choice != 1 || choice != 2)) 
-                {
-                    Console.WriteLine("Enter a Valid Choice");
-                }
-                Console.WriteLine();
-                switch (choice)
-                {
-                    case 1:
-                        Console.Write("Choose the type of Account you want to open -: \n1. Current Account\n2. Savings Account\nEnter your Choice of Account (1 or 2) : ");
-                        while (!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2))
-                        {
-                            Console.Write("Enter a Valid Choice : ");
-                        }
-                        NewAccount(choice);
-                        break;
-                    case 2:
-                        Console.WriteLine("You don't have any existing Account!!");
-                        break;
-                    default:
-                        Console.WriteLine("Choose a Valid Account type!!!");
-                        break;
-                }
-
-                Console.Write("Enter 1 to continue with another account : ");
-
-                if (Console.ReadLine() != "1")
-                {
-                    Console.WriteLine("Thanks for visiting us!!!!");
-                    break;
-                }
-            }
-        }
-
         static void NewAccount(int choice)
         {
             Console.WriteLine();
@@ -349,7 +411,7 @@ namespace Module_2
                 Console.Write("Enter Valid Age (Age >= 18): ");
             }
 
-           
+
             if (userName.Length >= 3 && userAge >= 18)
             {
                 switch (choice)
@@ -376,11 +438,17 @@ namespace Module_2
         {
             while (true)
             {
-                Console.Write("\nWelcome to ABC Bank!!\n1. New Account\n2. Existing Account\nChoose your Account Type : ");
-                if (!int.TryParse(Console.ReadLine(), out int choice))
+                Console.Write("\nWelcome to ABC Bank!!\n1. New Account\n2. Existing Account\nChoose your Account Type or (Press 3 to Exit...) : ");
+                if (!int.TryParse(Console.ReadLine(), out int choice) || (choice != 1 && choice != 2 && choice != 3))
                 {
                     Console.WriteLine("Enter a Valid Choice");
                 }
+                if (choice == 3)
+                {
+                    Console.WriteLine("Thank you for Visiting the Bank!!!");
+                    break;
+                }
+                Console.WriteLine();
 
                 switch (choice)
                 {
@@ -389,6 +457,147 @@ namespace Module_2
                         break;
                     case 2:
                         Console.WriteLine("You don't have any existing Account!!");
+                        break;
+                    default:
+                        Console.WriteLine("Choose a Valid Account type!!!");
+                        break;
+                }
+
+                Console.Write("\nEnter 1 to continue with another account : ");
+
+                if (Console.ReadLine() != "1")
+                {
+                    Console.WriteLine("Thanks for visiting us!!!!");
+                    break;
+                }
+            }
+        }
+
+        static void ExistingAccount()
+        {
+            Console.WriteLine();
+            Console.Write("1. Current Account\n2. Savings Account\nChoose your Existing Account type : ");
+
+            int choice;
+            while (!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2))
+            {
+                Console.WriteLine("Wrong Choice!!!");
+                Console.Write("Choose your Account type (1 or 2) or (3 to Exit..) : ");
+            }
+
+            Console.WriteLine();
+            Console.Write("Enter your Account Number : ");
+            long accountNumber;
+            while (!long.TryParse(Console.ReadLine(), out accountNumber) || (accountNumber.ToString().Length != 11))
+            {
+                Console.WriteLine("Invalid Account Number!!");
+                Console.WriteLine("Account Number should be Integer and of 11 Digits!!!");
+                Console.Write("Enter the Account Number Again : ");
+            }
+
+            string accountDetailsStoragePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../AccountsStorage/", accountNumber + ".txt");
+            accountDetailsStoragePath = Path.GetFullPath(accountDetailsStoragePath);
+
+            if (choice == 1)
+            {
+                CurrentAccount myExistingAccount;
+
+                if (File.Exists(accountDetailsStoragePath))
+                {
+                    using (StreamReader stream = new StreamReader(accountDetailsStoragePath))
+                    {
+                        string accountDetails = stream.ReadToEnd();
+
+                        stream.Close();
+
+                        string[] props = accountDetails.Split(',');
+
+                        //string accountType = props[4];
+                        long currentAccountNumber = Convert.ToInt64(props[0]);
+                        string currentAccountHolderName = props[1];
+                        int currentAccountHolderAge = Convert.ToInt32(props[2]);
+                        decimal currentBankBalance = Convert.ToDecimal(props[3]);
+
+                        myExistingAccount = new CurrentAccount(currentAccountNumber, currentAccountHolderName, currentAccountHolderAge, currentBankBalance);
+
+                        Console.WriteLine("\nWelcome Back!!!");
+
+                        BankingOperations(myExistingAccount);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("This Account Number is not assosicated with our Bank!!!");
+                }
+            }
+            else
+            {
+                SavingsAccount myExistingAccount;
+
+                if (File.Exists(accountDetailsStoragePath))
+                {
+                    using (StreamReader stream = new StreamReader(accountDetailsStoragePath))
+                    {
+                        string accountDetails = stream.ReadToEnd();
+                        string[] props = accountDetails.Split(',');
+
+                        long currentAccountNumber = Convert.ToInt64(props[0]);
+                        string currentAccountHolderName = props[1];
+                        int currentAccountHolderAge = Convert.ToInt32(props[2]);
+                        decimal currentBankBalance = Convert.ToDecimal(props[3]);
+
+                        stream.Close();
+
+                        myExistingAccount = new SavingsAccount(currentAccountNumber, currentAccountHolderName, currentAccountHolderAge, currentBankBalance);
+
+                        Console.WriteLine("\nWelcome Back!!!");
+
+                        BankingOperations(myExistingAccount);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("This Account Number is not assosicated with our Bank!!!");
+                }
+            }
+
+        }
+
+        static void Task3(int taskChoice)
+        {
+            int choice;
+            while (true)
+            {
+                Console.Write("\nWelcome to ABC Bank!!\n1. New Account\n2. Existing Account\nChoose your Account Type or (Press 3 to exit... : ");
+                if (!int.TryParse(Console.ReadLine(), out choice) && (choice != 1 || choice != 2 || choice != 3))
+                {
+                    Console.WriteLine("Enter a Valid Choice");
+                }
+                if(choice == 3)
+                {
+                    Console.WriteLine("Thank You for visiting the Bank!!!");
+                    break;
+                }
+                Console.WriteLine();
+                switch (choice)
+                {
+                    case 1:
+                        Console.Write("Choose the type of Account you want to open -: \n1. Current Account\n2. Savings Account\nEnter your Choice of Account (1 or 2) : ");
+                        while (!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2))
+                        {
+                            Console.Write("Enter a Valid Choice : ");
+                        }
+                        NewAccount(choice);
+                        break;
+                    case 2:
+                        if (taskChoice == 2)
+                        {
+                            Console.WriteLine("You cannot use an Existing Account!!");
+                        }
+                        else
+                        {
+                            ExistingAccount();
+                        }
                         break;
                     default:
                         Console.WriteLine("Choose a Valid Account type!!!");
@@ -408,10 +617,15 @@ namespace Module_2
         {
             while (true)
             {
-                Console.Write("Task 1 -> Enter 1\nTask 2 -> Enter 2\nTask 3 -> Enter 3\nChoose the Task to perform : ");
-                if (!int.TryParse(Console.ReadLine(), out int taskChoice))
+                Console.Write("1. Basic Functionalities of OOPS\n2. Enter the Bank\n\nChoose the Task to perform or (Press 3 to exit...) : ");
+                if (!int.TryParse(Console.ReadLine(), out int taskChoice) || (taskChoice != 1 && taskChoice != 2 && taskChoice != 3))
                 {
                     Console.WriteLine("Enter a Valid Choice");
+                }
+                if (taskChoice == 3)
+                {
+                    Console.WriteLine("Exited!!!");
+                    break;
                 }
                 switch (taskChoice)
                 {
@@ -419,10 +633,7 @@ namespace Module_2
                         Task1();
                         break;
                     case 2:
-                        Task2();
-                        break;
-                    case 3:
-                        Task3();
+                        Bank();
                         break;
                     default:
                         Console.WriteLine("Wrong choice of Task!!");
