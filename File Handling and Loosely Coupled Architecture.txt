@@ -1,0 +1,147 @@
+1. Loosely Coupled Architecture
+		-> Software Design Principle
+		-> Components have minimal Dependecy upon each other
+		-> Ensures changes in one component doesn't impact other component heavily
+		-> Makes system more flexible, maintainable and scalable
+
+		-> Key Characteristics :
+				* Cleaner Code -> Makes the code more readable
+				* Maintainable Code -> Easier to change and maintain the code
+				* Testable Code -> Makes it easier to do Unit Testing
+				* Scalable Code -> Allows to Scale the Bog Projects easily
+
+		-> Example : 
+                // Creating an interface
+
+				public interface IFileService
+                {
+                    string ReadFile(string filePath);
+                }
+
+                // Implementing the interface
+
+                public class FileService : IFileService
+                {
+                    public string ReadFile(string filePath) {
+                        return File.ReadAllText(filePath);
+                    }
+                }
+
+                public class FileController
+                {
+                    private readonly IFileService _fileService;
+
+                    public FileController(IFileService fileService)
+                    {
+                        _fileService = fileService; // Injected dependency
+                    }
+
+                    public string ReadFile(string path)
+                    {
+                        return _fileService.ReadFile(path);
+                    }
+                }
+
+2. Dependency Injection
+        -> Design Pattern 
+        -> Technique to achieve Loosely Coupled Architecture
+        -> Allows Dependency to be injected from outside the class
+        -> Reduces the hard-coded dependencies between the classes
+        -> Makes the code more testable and maintainable
+        
+        -> Types of Dependency Injection :
+                1. Constructor Injection
+                        -> Dependencies are provided through a class constructor
+                        -> Example : 
+                                public class FileController
+                                {
+                                    private readonly IFileService _fileService;
+                                    public FileController(IFileService fileService)
+                                    {
+                                        _fileService = fileService; // Injected dependency
+                                    }
+                                    public string ReadFile(string path)
+                                    {
+                                        return _fileService.ReadFile(path);
+                                    }
+                                }
+                           -> Benefits :
+                                * Ensures that the class has all the required dependencies
+                                * Makes the class more testable
+                                * Reduces the complexity of the code
+                            -> Drawbacks :
+                                * Constructor Injection can lead to a long list of dependencies
+                                * Can make the class difficult to maintain
+                            -> Best Practices :
+                                * Limit the number of dependencies
+                                * Use interfaces to define dependencies
+                                * Use a DI container to manage dependencies
+                      
+                2. Property Injection
+                        -> Dependencies are provided through public properties
+                        -> Example : 
+                                public class FileController
+                                {
+                                    public IFileService FileService { get; set; }
+                                    public string ReadFile(string path)
+                                    {
+                                        return FileService.ReadFile(path);
+                                    }
+                                }
+                        -> Benefits :
+                                * Allows for optional dependencies
+                                * Can be used with existing classes
+                        -> Drawbacks :
+                                * Can lead to null reference exceptions
+                                * Can make the class difficult to test
+                        -> Best Practices :
+                                * Use property injection for optional dependencies
+                                * Use constructor injection for required dependencies
+                                * Use interfaces to define dependencies
+
+                3. Method Injection
+                        -> Dependencies are provided through method parameters
+                        -> Example : 
+                                public class FileController
+                                {
+                                    public string ReadFile(IFileService fileService, string path)
+                                    {
+                                        return fileService.ReadFile(path);
+                                    }
+                                }
+                        -> Benefits :
+                                * Allows for optional dependencies
+                                * Can be used with existing classes
+                        -> Drawbacks :
+                                * Can lead to long parameter lists
+                                * Can make the class difficult to test
+                        -> Best Practices :
+                                * Use method injection for optional dependencies
+                                * Use constructor injection for required dependencies
+                                * Use interfaces to define dependencies
+         
+        -> Example : 
+                // Creating an interface
+                public interface IFileService
+                {
+                    string ReadFile(string filePath);
+                }
+                // Implementing the interface
+                public class FileService : IFileService
+                {
+                    public string ReadFile(string filePath) {
+                        return File.ReadAllText(filePath);
+                    }
+                }
+                public class FileController
+                {
+                    private readonly IFileService _fileService;
+                    public FileController(IFileService fileService)
+                    {
+                        _fileService = fileService; // Injected dependency
+                    }
+                    public string ReadFile(string path)
+                    {
+                        return _fileService.ReadFile(path);
+                    }
+                }
